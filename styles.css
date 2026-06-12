@@ -1,0 +1,1771 @@
+/* ============================================================
+   성남 미래지도 — Dark Futuristic Redesign
+   index.html 구조/스크립트 변경 없이 styles.css만 교체
+   ============================================================ */
+
+/* ---------- Fonts ---------- */
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('Paperlogy-7Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Paperlogy';
+  src: url('Paperlogy-8ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-display: block;
+}
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* 분야 컬러 */
+  --renovation: #dfa088;   /* 재건축 — 뮤트 샐먼 */
+  --enterprise: #8db4dd;   /* 대기업/IT — 소프트 스틸 블루 */
+  --market:     #ddc290;   /* 골목상권 — 뮤트 샌드 골드 */
+  --youth:      #ab9bd8;   /* 청년 — 뮤트 라벤더 */
+  --senior:     #8cc7ab;   /* 어르신 — 뮤트 세이지 */
+
+  /* 씬 팔레트 */
+  --bg-0: #030609;
+  --bg-1: #060c14;
+  --bg-2: #0a1322;
+  --ink: #eaf2ff;
+  --ink-dim: rgba(234, 242, 255, .56);
+  --ink-faint: rgba(234, 242, 255, .34);
+  --line: rgba(120, 170, 255, .14);
+  --cyan: #35d2ff;
+  --magenta: #f5324b;
+
+  --font-display: 'Paperlogy', 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-intro: 'Giants', 'Paperlogy', 'Pretendard', sans-serif;
+  --font-body: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  /* 시퀀스 타임 스케일 — Tweaks에서 조절 (1 = 기준, 클수록 느림) */
+  --tscale: 1;
+  --ttypo: 1;
+  --st: calc(var(--tscale) * var(--ttypo));
+  --ease-soft: cubic-bezier(.45, 0, .15, 1);
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--bg-0);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button { font-family: inherit; }
+
+/* ---------- Stage (전체 씬) ---------- */
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 700px at 78% 12%, rgba(31, 123, 216, .16), transparent 62%),
+    radial-gradient(900px 640px at 14% 86%, rgba(138, 63, 252, .12), transparent 60%),
+    radial-gradient(1300px 560px at 50% 106%, rgba(177, 32, 149, .13), transparent 72%),
+    radial-gradient(720px 540px at 50% 50%, rgba(53, 210, 255, .05), transparent 70%),
+    linear-gradient(160deg, var(--bg-1), var(--bg-0) 58%, #02040a);
+}
+
+/* 별빛 입자 + 오로라 글로우 (그리드 대체) */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(760px 480px at 72% 16%, rgba(53, 210, 255, .075), transparent 70%),
+    radial-gradient(660px 440px at 22% 74%, rgba(176, 124, 255, .065), transparent 70%),
+    radial-gradient(1.6px 1.6px at 18% 24%, rgba(200, 232, 255, .5), transparent 60%),
+    radial-gradient(1.2px 1.2px at 64% 12%, rgba(255, 255, 255, .38), transparent 60%),
+    radial-gradient(1.8px 1.8px at 84% 56%, rgba(53, 210, 255, .34), transparent 60%),
+    radial-gradient(1.1px 1.1px at 38% 74%, rgba(255, 255, 255, .3), transparent 60%),
+    radial-gradient(1.4px 1.4px at 8% 62%, rgba(176, 124, 255, .32), transparent 60%),
+    radial-gradient(1.2px 1.2px at 52% 42%, rgba(255, 255, 255, .24), transparent 60%),
+    radial-gradient(1px 1px at 92% 86%, rgba(200, 232, 255, .28), transparent 60%),
+    radial-gradient(1.5px 1.5px at 72% 78%, rgba(255, 161, 220, .26), transparent 60%);
+  background-repeat: no-repeat, no-repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat;
+  background-size: auto, auto, 520px 520px, 460px 460px, 610px 610px, 380px 380px, 440px 440px, 340px 340px, 560px 560px, 500px 500px;
+  mask-image: radial-gradient(130% 100% at 50% 44%, #000 34%, transparent 84%);
+  -webkit-mask-image: radial-gradient(130% 100% at 50% 44%, #000 34%, transparent 84%);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stage::before { animation: sky-breathe 16s ease-in-out infinite alternate; }
+}
+@keyframes sky-breathe {
+  from { opacity: .7; }
+  to   { opacity: 1; }
+}
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(140% 110% at 50% 46%, transparent 56%, rgba(1, 3, 7, .82));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 인트로 동안 본 화면 숨김 → 진입 시 시퀀스대로 등장 */
+.stage.is-intro > :not(.intro-loader):not(.webgl-bg) { opacity: 0; }
+.stage.intro-ready > :not(.intro-loader):not(.video-layer):not(.completion):not(.map-wrap):not(.city-logo-badge):not(.test-run):not(.credit):not(.webgl-bg) {
+  animation: stage-rise 1.1s var(--ease-out) both;
+}
+.stage.intro-ready > .test-run,
+.stage.intro-ready > .credit {
+  animation: stage-rise 1.1s var(--ease-out) calc(5.6s * var(--tscale)) both;
+}
+/* 지도는 돌리-인 연출이 담당(아래), UI는 완성 후 등장 */
+/* 로고가 먼저 화면 앞으로 확 치고 나왔다가 제자리 안착 (로더가 걷힌 뒤 시작) */
+.stage.intro-ready > .city-logo-badge {
+  animation: logo-hero calc(1.7s * var(--tscale)) cubic-bezier(.5, 0, .22, 1) calc(.9s * var(--tscale)) both;
+}
+@keyframes logo-hero {
+  0% {
+    opacity: 0;
+    transform:
+      translate(calc(50vw - clamp(24px, 3.4vw, 56px) - 50%), calc(46vh - clamp(24px, 4vh, 44px) - 50%))
+      scale(7.5);
+  }
+  /* 확 — 빠르게 치고 나옴 */
+  13% {
+    opacity: 1;
+    transform:
+      translate(calc(50vw - clamp(24px, 3.4vw, 56px) - 50%), calc(46vh - clamp(24px, 4vh, 44px) - 50%))
+      scale(3.9);
+  }
+  /* 짧게 머무르며 글로우 */
+  42% {
+    opacity: 1;
+    transform:
+      translate(calc(50vw - clamp(24px, 3.4vw, 56px) - 50%), calc(46vh - clamp(24px, 4vh, 44px) - 50%))
+      scale(3.75);
+  }
+  /* 코너로 비행하며 축소 */
+  90% {
+    opacity: 1;
+    transform: translate(0, 0) scale(.95);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* (위에서 직접 선언) */
+
+/* 카메라 풀백에 맞춰 별빛 레이어도 함께 줌아웃 (패럴랙스) — 로고 다음 차례 */
+.stage.intro-ready::before {
+  animation:
+    sky-rush 3.4s cubic-bezier(.3, 0, .25, 1) 1.5s both,
+    sky-breathe 16s ease-in-out 4.9s infinite alternate;
+}
+@keyframes sky-rush {
+  0%   { transform: scale(1.45); opacity: 0; }
+  40%  { opacity: .85; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes stage-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Header ---------- */
+header {
+  position: absolute;
+  top: clamp(24px, 4vh, 44px);
+  left: clamp(24px, 3.4vw, 56px);
+  z-index: 5;
+  max-width: min(440px, 34vw);
+  pointer-events: none;
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(34px, 3.6vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -.015em;
+  background: linear-gradient(108deg, #ffffff 12%, #aee4ff 46%, #7fb6ff 72%, #c08cff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 26px rgba(53, 210, 255, .22));
+}
+
+/* 영문 오버라인 */
+header h1::before {
+  content: "SEONGNAM FUTURE MAP";
+  display: block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: .42em;
+  color: var(--cyan);
+  opacity: .75;
+  margin-bottom: 14px;
+  -webkit-text-fill-color: var(--cyan);
+}
+
+.subtitle {
+  margin: 14px 0 0;
+  font-size: clamp(12px, .85vw, 14px);
+  line-height: 1.75;
+  color: var(--ink-dim);
+  letter-spacing: .01em;
+  word-break: keep-all;
+}
+
+/* ---------- 성남시 로고 (좌상단, 박스 없이 크게) ---------- */
+.city-logo-badge {
+  position: absolute;
+  top: clamp(24px, 4vh, 44px);
+  left: clamp(24px, 3.4vw, 56px);
+  z-index: 5;
+}
+.city-logo-badge img {
+  display: block;
+  height: clamp(68px, 7.2vw, 116px);
+  width: auto;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, .55));
+}
+
+/* ---------- 진행률 HUD ---------- */
+.progress {
+  position: absolute;
+  left: clamp(24px, 3.4vw, 56px);
+  bottom: clamp(26px, 4.6vh, 52px);
+  z-index: 5;
+  width: min(320px, 26vw);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progress::before {
+  content: "MERGE PROGRESS";
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .4em;
+  color: var(--ink-faint);
+}
+
+#progressText {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: .02em;
+  color: var(--ink);
+  text-shadow: 0 0 18px rgba(53, 210, 255, .3);
+}
+
+.progress-track {
+  position: relative;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(140, 180, 255, .12);
+  overflow: hidden;
+}
+.progress-track::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(20% - 1px), rgba(3, 7, 12, .9) calc(20% - 1px) 20%);
+}
+
+.progress-bar {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--cyan), #7fb6ff 55%, var(--magenta));
+  box-shadow: 0 0 14px rgba(53, 210, 255, .65);
+  transition: width .9s var(--ease-soft);
+}
+
+/* ---------- 시연용 버튼 ---------- */
+.test-run {
+  position: absolute;
+  right: clamp(24px, 3.4vw, 56px);
+  bottom: clamp(64px, 9.5vh, 104px);
+  z-index: 5;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 210, 255, .35);
+  background: rgba(53, 210, 255, .06);
+  color: #bfeaff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  cursor: pointer;
+  transition: all .35s var(--ease-out);
+  backdrop-filter: blur(8px);
+}
+.test-run:hover:not(:disabled) {
+  background: rgba(53, 210, 255, .16);
+  border-color: rgba(53, 210, 255, .7);
+  box-shadow: 0 0 24px rgba(53, 210, 255, .35);
+  transform: translateY(-2px);
+}
+.test-run:disabled { opacity: .45; cursor: wait; }
+
+/* ---------- 커스텀 커서 (scene.js) ---------- */
+body.cursor-fx,
+body.cursor-fx * { cursor: none !important; }
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  pointer-events: none;
+  border-radius: 50%;
+  will-change: transform;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: #fff;
+  mix-blend-mode: difference;
+}
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1.2px solid rgba(140, 220, 255, .65);
+  transition: width .3s var(--ease-out), height .3s var(--ease-out), margin .3s var(--ease-out), border-color .3s;
+}
+.cursor-ring.is-hover {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-color: rgba(255, 255, 255, .9);
+}
+
+/* ---------- 에디토리얼 HUD 디테일 ---------- */
+.hud-meta {
+  position: absolute;
+  right: clamp(18px, 2.4vw, 40px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .34em;
+  color: rgba(160, 200, 255, .38);
+  pointer-events: none;
+  user-select: none;
+}
+.hud-meta::before,
+.hud-meta::after {
+  content: "";
+  width: 1px;
+  height: 64px;
+  background: linear-gradient(180deg, transparent, rgba(160, 200, 255, .3), transparent);
+}
+
+/* ---------- 살아있는 씬 레이어 (webgl-bg.js / scene.js) ---------- */
+.webgl-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+/* WebGL 배경이 있으면 CSS 별빛 레이어는 끌 (이중 노출 방지) */
+.stage.has-webgl::before { content: none; }
+.scene-ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.map-light {
+  position: absolute;
+  inset: -30%; /* 가장자리 직사각형 절단면 방지 */
+  z-index: 3;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  background: radial-gradient(380px 300px at var(--lx, 50%) var(--ly, 42%),
+    rgba(130, 215, 255, .12), rgba(170, 130, 255, .05) 48%, transparent 72%);
+}
+.map-shell { will-change: transform; }
+
+/* ---------- 지도 ---------- */
+.map-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+}
+
+.map-shell {
+  position: relative;
+  width: min(1180px, 86vw, 150vh);
+}
+
+/* 지도 뒤 앰비언트 글로우 */
+.map-shell::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  background:
+    radial-gradient(46% 52% at 50% 48%, rgba(53, 210, 255, .12), transparent 70%),
+    radial-gradient(34% 40% at 62% 36%, rgba(138, 63, 252, .09), transparent 70%);
+  filter: blur(8px);
+  animation: ambient-breathe 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes ambient-breathe {
+  0%, 100% { opacity: .75; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.035); }
+}
+
+.map-shell svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* 성남 외곽 실루엣 */
+.outer-border {
+  fill: rgba(9, 16, 29, .72);
+  stroke: rgba(150, 195, 255, .4);
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  filter:
+    drop-shadow(0 0 1.5px rgba(53, 210, 255, .8))
+    drop-shadow(0 0 22px rgba(53, 210, 255, .16))
+    drop-shadow(0 30px 60px rgba(0, 0, 0, .55));
+}
+
+/* ----- 영역(분야) ----- */
+.district {
+  cursor: pointer;
+  outline: none;
+}
+
+.district .base {
+  fill: var(--color);
+  fill-opacity: 0;
+  stroke: rgba(150, 195, 255, .4);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition: fill-opacity .5s var(--ease-out), filter .5s var(--ease-out);
+}
+
+.district:hover .base,
+.district:focus-visible .base {
+  fill-opacity: .34;
+  filter: drop-shadow(0 0 18px var(--color)) brightness(1.12);
+}
+.district .base,
+.district .label { transition: fill-opacity .35s var(--ease-out), filter .35s var(--ease-out), letter-spacing .4s var(--ease-out); }
+.district:hover .label { letter-spacing: .06em; }
+
+.district:focus-visible .base {
+  stroke: rgba(255, 255, 255, .85);
+  stroke-width: 3;
+}
+
+/* 핀 */
+.district .pin {
+  transform-box: fill-box;
+  transform-origin: center;
+  stroke: rgba(255, 255, 255, .9);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 8px var(--color));
+  animation: pin-pulse 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes pin-pulse {
+  0%, 100% { transform: scale(1);    opacity: .95; }
+  50%      { transform: scale(1.35); opacity: .7;  }
+}
+
+/* 라벨 / 캡션 */
+.district .label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 31px;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: central;
+  letter-spacing: .04em;
+  paint-order: stroke;
+  stroke: rgba(4, 9, 16, .4);
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 7px rgba(0, 0, 0, .55));
+  transform: translateY(-26px);
+  pointer-events: none;
+  transition: opacity .5s var(--ease-out);
+}
+
+/* \ub77c\ubca8\ubcc4 \uc138\ub85c \uc704\uce58 \ubbf8\uc138\uc870\uc815 (\uc0ac\uc6a9\uc790 \uc9c0\uc815 \ubca0\uc774\uc2a4\ub77c\uc778) */
+.district[data-id="youth"] .label { transform: translateY(-8px); }
+.district[data-id="enterprise"] .label { transform: translateY(-11px); }
+.district[data-id="market"] .label { transform: translateY(-15px); }
+
+.district .caption {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14.5px;
+  fill: rgba(234, 242, 255, .62);
+  text-anchor: middle;
+  letter-spacing: .03em;
+  paint-order: stroke;
+  stroke: rgba(4, 9, 16, .7);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  pointer-events: none;
+  transition: opacity .5s var(--ease-out), fill .5s var(--ease-out);
+}
+
+/* 재생 중(active) */
+.district.active .base {
+  fill-opacity: .85;
+  filter: drop-shadow(0 0 16px var(--color)) brightness(1.15);
+}
+
+/* 완료(done) — 계속 빛남 (정적 글로우 — 무한 펄스는 섹도우 재연산으로 상시 잭을 유발) */
+.district.done .base {
+  fill-opacity: .8;
+  filter:
+    drop-shadow(0 0 10px var(--color))
+    drop-shadow(0 0 30px var(--color))
+    saturate(1);
+  animation: district-ignite 1.15s var(--ease-out) both;
+}
+.district.done .caption { fill: rgba(255, 255, 255, .92); }
+.district.done .pin { animation: none; transform: scale(1); opacity: 1; }
+
+/* 비어있던 영역이 빛으로 점화되며 채워진다 */
+@keyframes district-ignite {
+  0% {
+    fill-opacity: 0;
+  }
+  45% {
+    fill-opacity: 1;
+  }
+  100% {
+    fill-opacity: .8;
+  }
+}
+
+@keyframes done-glow {
+  0%, 100% { fill-opacity: .74; }
+  50%      { fill-opacity: .92; }
+}
+
+/* ----- 합체된 단일 지도 ----- */
+.unified-map {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 3.2;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  pointer-events: none;
+}
+
+/* 완성 시퀀스: 분야 순차 백열 → 소멸 → 단일 외곽선 + 하나의 빛 */
+.stage.complete .district {
+  opacity: 0;
+  transition: opacity 1.6s var(--ease-soft) 1.1s;
+  pointer-events: none;
+}
+
+.stage.complete .unified-map {
+  fill: url(#finalMapGradient);
+  fill-opacity: .85;
+  stroke: #fff;
+  filter:
+    drop-shadow(0 0 14px rgba(53, 210, 255, .8))
+    drop-shadow(0 0 44px rgba(138, 63, 252, .5))
+    drop-shadow(0 0 90px rgba(245, 50, 75, .3));
+  animation:
+    unified-draw 3s var(--ease-soft) 1s both,
+    unified-flash 1s cubic-bezier(.2, 0, .4, 1) 4s both,
+    unified-fill 1.8s cubic-bezier(.25, 1, .5, 1) 3.2s both,
+    unified-breathe 7s ease-in-out 5.4s infinite;
+}
+
+/* 테두리가 다 그려진 순간, 한 번 살짝 빛남 */
+@keyframes unified-flash {
+  0% {
+    stroke-width: 3.2;
+    filter:
+      drop-shadow(0 0 14px rgba(53, 210, 255, .8))
+      drop-shadow(0 0 44px rgba(138, 63, 252, .5))
+      drop-shadow(0 0 90px rgba(245, 50, 75, .3))
+      brightness(1);
+  }
+  22% {
+    stroke-width: 4.6;
+    filter:
+      drop-shadow(0 0 10px rgba(255, 255, 255, .95))
+      drop-shadow(0 0 40px rgba(255, 255, 255, .65))
+      drop-shadow(0 0 100px rgba(255, 255, 255, .35))
+      brightness(1.55);
+  }
+  100% {
+    stroke-width: 3.2;
+    filter:
+      drop-shadow(0 0 14px rgba(53, 210, 255, .8))
+      drop-shadow(0 0 44px rgba(138, 63, 252, .5))
+      drop-shadow(0 0 90px rgba(245, 50, 75, .3))
+      brightness(1);
+  }
+}
+
+/* 움직이는 무지개 대신, 정적 그라데이션이 천천히 숨 쉬는 광 */
+@keyframes unified-breathe {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 14px rgba(53, 210, 255, .8))
+      drop-shadow(0 0 44px rgba(138, 63, 252, .5))
+      drop-shadow(0 0 90px rgba(245, 50, 75, .3))
+      brightness(1);
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 20px rgba(53, 210, 255, .95))
+      drop-shadow(0 0 60px rgba(138, 63, 252, .65))
+      drop-shadow(0 0 110px rgba(245, 50, 75, .4))
+      brightness(1.14);
+  }
+}
+
+@keyframes unified-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes unified-fill {
+  from { fill-opacity: 0; }
+  to   { fill-opacity: .85; }
+}
+
+.stage.complete .outer-border {
+  stroke: rgba(255, 255, 255, .25);
+}
+
+.stage.complete .hint { opacity: 0; }
+
+/* ---------- 힌트 / 크레딧 ---------- */
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 3.4vh, 36px);
+  transform: translateX(-50%);
+  z-index: 5;
+  margin: 0;
+  font-size: 12.5px;
+  letter-spacing: .04em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  transition: opacity .8s ease;
+}
+.hint::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  vertical-align: 1px;
+  animation: hint-blink 2.2s ease-in-out infinite;
+}
+@keyframes hint-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .25; }
+}
+
+.credit {
+  position: absolute;
+  right: clamp(24px, 3.4vw, 56px);
+  top: clamp(28px, 4.6vh, 50px);
+  z-index: 5;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18.5px;
+  letter-spacing: .14em;
+  color: rgba(255, 255, 255, .94);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .6);
+}
+
+/* ============================================================
+   영상 레이어 (분야별 풀스크린 전환)
+   ============================================================ */
+.video-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.video-pop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 6vh 8vw;
+  text-align: center;
+  opacity: 0;
+  background:
+    radial-gradient(58% 64% at 50% 38%, color-mix(in srgb, var(--color) 26%, transparent), transparent 72%),
+    radial-gradient(120% 110% at 50% 110%, rgba(2, 4, 9, .9), rgba(2, 4, 9, .97)),
+    var(--bg-0);
+  backdrop-filter: blur(10px);
+  transition: opacity .55s var(--ease-out);
+}
+
+.video-pop.show { opacity: 1; pointer-events: auto; }
+.video-pop.exit { opacity: 0; transition: opacity .6s ease; }
+
+/* 스캔라인 텍스처 */
+.video-pop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .025) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+.video-mark {
+  order: -2;
+  font-family: var(--font-mono);
+  font-size: clamp(15px, 1.4vw, 19px);
+  font-weight: 600;
+  letter-spacing: .5em;
+  color: var(--color);
+  text-shadow: 0 0 18px var(--color);
+}
+.video-mark::before { content: "AGENDA — "; color: var(--ink-faint); text-shadow: none; }
+
+.video-title {
+  order: -1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(46px, 6.2vw, 96px);
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  background: linear-gradient(120deg, #fff 28%, color-mix(in srgb, var(--color) 78%, #fff) 62%, var(--color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 34px color-mix(in srgb, var(--color) 55%, transparent));
+  animation: pop-title-in .8s var(--ease-out) both;
+}
+@keyframes pop-title-in {
+  from { opacity: 0; transform: translateY(34px) scale(.96); filter: blur(10px); }
+  to   { opacity: 1; transform: none; filter: blur(0) drop-shadow(0 0 34px color-mix(in srgb, var(--color) 55%, transparent)); }
+}
+
+.video-copy {
+  margin: 0;
+  max-width: 640px;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.85;
+  color: rgba(234, 242, 255, .78);
+  word-break: keep-all;
+  animation: pop-copy-in .9s var(--ease-out) .18s both;
+}
+@keyframes pop-copy-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.video-progress {
+  position: relative;
+  width: min(420px, 60vw);
+  height: 3px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  overflow: hidden;
+}
+.video-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color) 70%, #fff), var(--color));
+  box-shadow: 0 0 12px var(--color);
+}
+.video-pop.show .video-progress span {
+  animation: video-progress-run 2s linear forwards; /* index.html의 videoDuration=2000ms와 동기 */
+}
+@keyframes video-progress-run {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* ============================================================
+   완성 연출
+   ============================================================ */
+.completion {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(70% 70% at 50% 50%, rgba(2, 5, 10, .38), rgba(2, 5, 10, .72));
+  transition: opacity 1.4s var(--ease-soft), visibility 0s 1.4s;
+}
+.completion.show {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 1.2s var(--ease-soft) 3.2s, visibility 0s 3.2s;
+}
+
+.completion h2 {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font-family: var(--font-intro, var(--font-display));
+  font-weight: 800;
+  font-size: clamp(52px, 7.4vw, 124px);
+  letter-spacing: .01em;
+  text-align: center;
+  background: linear-gradient(115deg, #fff 18%, var(--cyan) 42%, #b07cff 66%, var(--magenta) 92%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter:
+    drop-shadow(0 6px 26px rgba(0, 0, 0, .92))
+    drop-shadow(0 2px 6px rgba(0, 0, 0, .8))
+    drop-shadow(0 0 40px rgba(53, 210, 255, .45));
+  animation: final-title-sheen 5s ease-in-out infinite;
+}
+.completion.show h2 { animation: final-title-in 1.8s var(--ease-out) 6.2s both, final-title-sheen 5s ease-in-out 8s infinite; }
+
+@keyframes final-title-in {
+  from { opacity: 0; transform: perspective(900px) rotateX(48deg) translateY(70px) scale(.88); letter-spacing: .26em; filter: blur(16px); }
+  60%  { transform: perspective(900px) rotateX(-5deg) translateY(-4px) scale(1.02); letter-spacing: .03em; }
+  to   { opacity: 1; transform: none; letter-spacing: .01em; filter: blur(0) drop-shadow(0 6px 26px rgba(0, 0, 0, .92)) drop-shadow(0 2px 6px rgba(0, 0, 0, .8)) drop-shadow(0 0 40px rgba(53, 210, 255, .45)); }
+}
+@keyframes final-title-sheen {
+  0%, 100% { background-position: 0% 0; }
+  50%      { background-position: 100% 0; }
+}
+
+/* 메시지 보강 (DOM 추가 없이) */
+.completion h2::after {
+  content: "다섯 개의 의제가 하나의 빛으로 — 성남 미래지도가 완성됩니다";
+  display: block;
+  margin-top: 26px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(13px, 1.1vw, 17px);
+  letter-spacing: .12em;
+  color: var(--ink-dim);
+  -webkit-text-fill-color: var(--ink-dim);
+  text-shadow: 0 2px 14px rgba(0, 0, 0, .95), 0 0 4px rgba(0, 0, 0, .8);
+  filter: none;
+}
+.completion.show h2::after {
+  animation: final-sub-in 1.1s var(--ease-out) 7.4s both;
+}
+@keyframes final-sub-in {
+  from { opacity: 0; transform: translateY(16px); letter-spacing: .3em; }
+  to   { opacity: 1; transform: none; letter-spacing: .12em; }
+}
+
+.final-effects {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.final-ring {
+  position: absolute;
+  width: 32vmin;
+  height: 32vmin;
+  border-radius: 50%;
+  border: 1.5px solid rgba(53, 210, 255, .55);
+  opacity: 0;
+}
+.completion.show .final-ring { animation: ring-expand 3.2s var(--ease-out) infinite; }
+.completion.show .ring-one { animation-delay: 7.6s; }
+.completion.show .ring-two {
+  border-color: rgba(245, 50, 75, .45);
+  animation-delay: 8.6s;
+}
+@keyframes ring-expand {
+  0%   { opacity: 0;   transform: scale(.4); }
+  12%  { opacity: .85; }
+  100% { opacity: 0;   transform: scale(3.1); }
+}
+
+.final-sparks {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 22% 28%, rgba(255,255,255,.9), transparent 60%),
+    radial-gradient(1.6px 1.6px at 74% 22%, rgba(53,210,255,.9), transparent 60%),
+    radial-gradient(2.2px 2.2px at 84% 64%, rgba(255,255,255,.8), transparent 60%),
+    radial-gradient(1.6px 1.6px at 30% 74%, rgba(245,50,75,.85), transparent 60%),
+    radial-gradient(1.8px 1.8px at 56% 14%, rgba(176,124,255,.9), transparent 60%),
+    radial-gradient(1.4px 1.4px at 12% 52%, rgba(53,210,255,.8), transparent 60%),
+    radial-gradient(2px 2px at 66% 84%, rgba(255,255,255,.75), transparent 60%),
+    radial-gradient(1.5px 1.5px at 44% 46%, rgba(255,200,87,.85), transparent 60%);
+  opacity: 0;
+}
+.completion.show .final-sparks { animation: sparks-twinkle 4s ease-in-out 7s infinite; }
+@keyframes sparks-twinkle {
+  0%, 100% { opacity: .25; transform: scale(1); }
+  50%      { opacity: .9;  transform: scale(1.04); }
+}
+
+/* ============================================================
+   완성 업그레이드: 카메라 푸시 + 분야 수렴 + 충격파 + 회전 헤일로
+   ============================================================ */
+/* 합쳐지는 동안 카메라가 3D로 씬을 한 바퀴 어루만지듯 무빙 */
+.stage.complete .map-shell {
+  animation: complete-camera 7s var(--ease-soft) both;
+}
+@keyframes complete-camera {
+  0%   { transform: none; }
+  16%  { transform: perspective(1300px) translateZ(130px) rotateX(7deg) rotateY(-3deg) scale(1.02); }
+  38%  { transform: perspective(1300px) translateZ(60px) rotateX(2deg) rotateY(4.5deg) rotateZ(-.7deg) scale(1.06); }
+  62%  { transform: perspective(1300px) translateZ(95px) rotateX(-3.5deg) rotateY(-3deg) rotateZ(.5deg) scale(1.12); }
+  82%  { transform: perspective(1300px) translateZ(30px) rotateX(1.2deg) rotateY(1.2deg) scale(1.17); }
+  100% { transform: scale(1.2); }
+}
+
+/* 5개 분야가 순차로 백열되며 하나의 빛으로 수렴 */
+.stage.complete .district {
+  animation: district-converge 1.3s var(--ease-out) both;
+}
+.stage.complete .district:nth-child(1) { animation-delay: .1s; }
+.stage.complete .district:nth-child(2) { animation-delay: .25s; }
+.stage.complete .district:nth-child(3) { animation-delay: .4s; }
+.stage.complete .district:nth-child(4) { animation-delay: .55s; }
+.stage.complete .district:nth-child(5) { animation-delay: .7s; }
+@keyframes district-converge {
+  0%   { filter: none; }
+  40%  { filter: brightness(2.3) saturate(1.6) blur(1.5px); }
+  100% { filter: brightness(.85) saturate(.65); }
+}
+
+/* 통합 순간 외곽에서 퍼지는 충격파 링 3중
+   (인트로 블롤 규칙보다 명시도를 높여 complete 상태에서 이김) */
+.stage.complete .map-wrap .map-shell::after {
+  content: "";
+  position: absolute;
+  inset: -4%;
+  z-index: 3;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, .85);
+  box-shadow: 0 0 44px rgba(53, 210, 255, .55), inset 0 0 44px rgba(53, 210, 255, .3);
+  filter: none;
+  background: none;
+  pointer-events: none;
+  animation: unify-shock 1.6s var(--ease-out) .7s both;
+}
+.stage.complete .map-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 52vmin;
+  height: 52vmin;
+  z-index: 3;
+  border-radius: 50%;
+  border: 1.5px solid rgba(245, 50, 75, .6);
+  box-shadow: 0 0 36px rgba(245, 50, 75, .35);
+  pointer-events: none;
+  animation: unify-shock 1.9s var(--ease-out) 1.4s both;
+}
+.stage.complete .map-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 64vmin;
+  height: 64vmin;
+  z-index: 3;
+  border-radius: 50%;
+  border: 1px solid rgba(176, 124, 255, .55);
+  box-shadow: 0 0 30px rgba(176, 124, 255, .3);
+  pointer-events: none;
+  animation: unify-shock 2.2s var(--ease-out) 2.1s both;
+}
+@keyframes unify-shock {
+  0%   { opacity: 0; transform: scale(.22); }
+  12%  { opacity: .95; }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+/* 타이틀 뒤 천천히 도는 코닉 헤일로 (원형 마스크 — 회전 시 모서리 안 보이게) */
+.completion::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  margin: -80vmax 0 0 -80vmax;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  background: conic-gradient(from 0deg at 50% 50%,
+    transparent 0deg,
+    rgba(53, 210, 255, .07) 38deg,
+    transparent 80deg,
+    rgba(176, 124, 255, .06) 150deg,
+    transparent 215deg,
+    rgba(245, 50, 75, .05) 275deg,
+    transparent 330deg);
+  mask-image: radial-gradient(circle, #000 28%, transparent 62%);
+  -webkit-mask-image: radial-gradient(circle, #000 28%, transparent 62%);
+  opacity: 0;
+  transition: opacity 1.6s var(--ease-soft) 1.3s;
+}
+.completion.show::before {
+  opacity: 1;
+  animation: halo-spin 18s linear infinite;
+  transition-delay: 6.8s;
+}
+@keyframes halo-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 하나로 합쳐지는 하이라이트 순간의 화이트아웃 플래시 */
+.completion::after {
+  content: "";
+  position: absolute;
+  inset: -28%; /* 화면을 가득 채우는 스케일 — 작은 타원(PPT) 느낌 제거 */
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(50% 50% at 50% 50%,
+    rgba(240, 252, 255, .95),
+    rgba(53, 210, 255, .3) 40%,
+    rgba(138, 63, 252, .12) 62%,
+    transparent 78%);
+}
+.completion.show::after {
+  animation: unify-whiteout 1.5s var(--ease-out) 5.8s both;
+}
+@keyframes unify-whiteout {
+  0%   { opacity: 0; transform: scale(.5); }
+  16%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(2.2); }
+  20%  { opacity: .95; }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* ----- 타이틀 직전 1.5초: 회전 광선이 중심으로 빨려드는 에너지 수렴 ----- */
+/* 1) 시계방향 회전 스포크 — 돌면서 중심으로 수축 */
+.final-effects::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 160vmin;
+  height: 160vmin;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  background: conic-gradient(from 10deg,
+    transparent 0deg, rgba(190, 235, 255, .5) 2.5deg, transparent 6deg,
+    transparent 92deg, rgba(255, 255, 255, .4) 94.5deg, transparent 98deg,
+    transparent 165deg, rgba(190, 235, 255, .45) 167.5deg, transparent 171deg,
+    transparent 248deg, rgba(255, 255, 255, .38) 250.5deg, transparent 254deg,
+    transparent 318deg, rgba(190, 235, 255, .42) 320.5deg, transparent 324deg);
+  mask-image: radial-gradient(circle, transparent 3%, #000 14%, #000 46%, transparent 64%);
+  -webkit-mask-image: radial-gradient(circle, transparent 3%, #000 14%, #000 46%, transparent 64%);
+}
+.completion.show .final-effects::before {
+  animation: none; /* CSS 보텍스 제거 — WebGL 노바(sceneFX.nova)가 담당 */
+}
+@keyframes vortex-in {
+  0%   { opacity: 0;  transform: rotate(0deg) scale(1.7); filter: blur(3px); }
+  22%  { opacity: 1;  filter: blur(0); }
+  80%  { opacity: .95; }
+  100% { opacity: 0;  transform: rotate(-210deg) scale(.04); filter: blur(1px); }
+}
+
+/* 2) 반대 방향 소용돌이 — 한 박자 뒦게 따라 빨려듦 */
+.final-effects::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 120vmin;
+  height: 120vmin;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  background: conic-gradient(from 230deg,
+    transparent 0deg, rgba(53, 210, 255, .34) 3.5deg, transparent 8deg,
+    transparent 118deg, rgba(255, 161, 220, .26) 121.5deg, transparent 126deg,
+    transparent 232deg, rgba(176, 124, 255, .3) 235.5deg, transparent 240deg);
+  mask-image: radial-gradient(circle, transparent 4%, #000 18%, #000 50%, transparent 68%);
+  -webkit-mask-image: radial-gradient(circle, transparent 4%, #000 18%, #000 50%, transparent 68%);
+  filter: blur(1px);
+}
+.completion.show .final-effects::after {
+  animation: none;
+}
+@keyframes vortex-in-rev {
+  0%   { opacity: 0;  transform: rotate(0deg) scale(1.5); }
+  25%  { opacity: 1; }
+  80%  { opacity: .9; }
+  100% { opacity: 0;  transform: rotate(170deg) scale(.05); }
+}
+
+/* ============================================================
+   인트로 로더
+   ============================================================ */
+.intro-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  perspective: 1000px;
+  perspective-origin: 50% 46%;
+  overflow: hidden;
+  transition: opacity .5s var(--ease-soft), visibility 0s .5s;
+}
+.intro-loader.is-hiding { opacity: 0; visibility: hidden; }
+
+/* 로더 배경: 런칭 시 먼저 걷혀 뒤의 지도 씬이 드러나도록 분리 */
+.intro-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* 반투명 베일 — 뒤의 WebGL 우주가 비치되, 타이포 대비는 확보 */
+  background:
+    radial-gradient(120% 95% at 50% 44%, rgba(2, 4, 9, .42) 30%, rgba(2, 4, 9, .78) 100%);
+  transition: opacity .68s var(--ease-soft);
+}
+.intro-loader.is-launching .intro-bg { opacity: 0; transition-delay: .4s; }
+
+.intro-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.intro-meta {
+  position: absolute;
+  top: clamp(24px, 4.4vh, 48px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: clamp(20px, 4vw, 60px);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .34em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+.intro-meta b {
+  color: var(--cyan);
+  font-weight: 600;
+  text-shadow: 0 0 12px rgba(53, 210, 255, .6);
+}
+
+/* 타이틀 워드 */
+.intro-word {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  gap: .04em;
+  transform-style: preserve-3d;
+  font-family: var(--font-intro, var(--font-display));
+  font-weight: 800;
+  font-size: clamp(56px, 9.4vw, 148px);
+  letter-spacing: .02em;
+  animation: word-float 5.6s ease-in-out 1.6s infinite;
+}
+.intro-word span {
+  display: inline-block;
+  /* 빛 그 자체 — 과노출 화이트 코어 + 시네마틱 쿨톤 엣지, 스텔 스윗 */
+  background: linear-gradient(110deg,
+    #dcebff 0%, #ffffff 26%, #aacdf2 46%, #ffffff 58%, #e8f3ff 78%, #bfd9f5 100%);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 28px rgba(160, 205, 255, .38)) drop-shadow(0 2px 50px rgba(110, 160, 230, .22));
+  animation:
+    word-in 1s var(--ease-out) calc(var(--i) * .1s + .15s) both,
+    word-sheen 6.5s ease-in-out 1.8s infinite;
+}
+@keyframes word-sheen {
+  0%, 100% { background-position: 0% 0; }
+  50%      { background-position: 100% 0; }
+}
+/* 폰트 로딩 완료 전에는 타이포 숨김 (교체 번쨍임 방지) */
+html:not(.fonts-ready) .intro-word,
+html:not(.fonts-ready) .intro-percent { visibility: hidden; }
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(46px) rotate(3deg) scale(.92); filter: blur(14px); }
+  to   { opacity: 1; transform: none; filter: blur(0) drop-shadow(0 0 28px rgba(160, 205, 255, .38)); }
+}
+@keyframes word-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+/* 워드 뒤 네뷸라 글로우 — 은은하게 떠다니는 빛 무리 */
+.intro-burst { display: none; } /* CSS 오브 제거 — WebGL 보케가 대체 */
+.intro-burst-legacy {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.intro-burst span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(54px);
+  animation: orb-drift 11s ease-in-out infinite alternate;
+}
+.intro-burst span:nth-child(1) {
+  left: 26%;
+  top: 24%;
+  width: 44vmin;
+  height: 44vmin;
+  background: radial-gradient(circle, rgba(53, 210, 255, .22), transparent 66%);
+}
+.intro-burst span:nth-child(2) {
+  left: 48%;
+  top: 38%;
+  width: 52vmin;
+  height: 52vmin;
+  background: radial-gradient(circle, rgba(245, 80, 190, .18), transparent 66%);
+  animation-delay: -4s;
+  animation-duration: 13s;
+}
+.intro-burst span:nth-child(3) {
+  left: 34%;
+  top: 50%;
+  width: 36vmin;
+  height: 36vmin;
+  background: radial-gradient(circle, rgba(176, 124, 255, .2), transparent 66%);
+  animation-delay: -8s;
+  animation-duration: 9s;
+}
+@keyframes orb-drift {
+  from { transform: translate(-12%, -8%) scale(.9); }
+  to   { transform: translate(10%, 9%) scale(1.12); }
+}
+
+/* 퍼센트 + 프로그레스 — 타이틀 바로 아래 스택 (퍼센트 위, 바 아래) */
+.intro-percent {
+  position: absolute;
+  z-index: 3;
+  top: calc(50% + clamp(44px, calc(4.7vw + 16px), 90px));
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: clamp(17px, 1.7vw, 24px);
+  font-weight: 700;
+  letter-spacing: .14em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 196, 232, .9);
+  text-shadow: 0 0 16px rgba(245, 80, 190, .5);
+}
+
+.intro-progress {
+  position: absolute;
+  z-index: 3;
+  top: calc(50% + clamp(80px, calc(4.7vw + 52px), 126px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(380px, 58vw);
+  height: 2px;
+  background: rgba(140, 180, 255, .14);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.intro-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #ff7ac4, #fff);
+  box-shadow: 0 0 12px rgba(245, 80, 190, .7);
+  transition: width .12s linear;
+}
+
+/* 진입 버튼 */
+.intro-enter {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(44px, 7.6vh, 84px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(53, 210, 255, .18);
+  background: rgba(53, 210, 255, .04);
+  color: rgba(234, 242, 255, .3);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: .26em;
+  text-indent: .26em;
+  cursor: not-allowed;
+  transition: all .6s var(--ease-out);
+}
+.intro-loader.is-loaded .intro-enter {
+  cursor: pointer;
+  color: #eaffff;
+  border-color: rgba(53, 210, 255, .65);
+  background: rgba(53, 210, 255, .1);
+  box-shadow: 0 0 28px rgba(53, 210, 255, .3), inset 0 0 18px rgba(53, 210, 255, .12);
+  animation: enter-beacon 2.4s ease-in-out infinite;
+}
+.intro-loader.is-loaded .intro-enter:hover {
+  background: rgba(53, 210, 255, .22);
+  box-shadow: 0 0 44px rgba(53, 210, 255, .55), inset 0 0 22px rgba(53, 210, 255, .2);
+  transform: translateX(-50%) translateY(-2px);
+}
+@keyframes enter-beacon {
+  0%, 100% { box-shadow: 0 0 22px rgba(53, 210, 255, .25), inset 0 0 16px rgba(53, 210, 255, .1); }
+  50%      { box-shadow: 0 0 44px rgba(53, 210, 255, .5),  inset 0 0 22px rgba(53, 210, 255, .18); }
+}
+
+.intro-status {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(20px, 3.4vh, 34px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: clamp(24px, 5vw, 70px);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: .36em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   발사(런칭): 타이포 줌-스루 → 씬 돌리-인  (ref. steven.com)
+   ============================================================ */
+.intro-loader.is-launching .intro-canvas,
+.intro-loader.is-launching .intro-percent,
+.intro-loader.is-launching .intro-progress,
+.intro-loader.is-launching .intro-enter,
+.intro-loader.is-launching .intro-meta,
+.intro-loader.is-launching .intro-status {
+  opacity: 0;
+  transition: opacity .55s ease;
+}
+
+/* 타이포 발사 순간 — 워드 중심에서 퍼지는 확산 링 3겹 */
+.intro-loader.is-launching .intro-burst {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.intro-loader.is-launching .intro-burst span {
+  left: 50%;
+  top: 47%;
+  width: clamp(180px, 30vmin, 340px);
+  height: clamp(180px, 30vmin, 340px);
+  background: none;
+  filter: none;
+  border: 2px solid rgba(140, 225, 255, .85);
+  border-radius: 50%;
+  box-shadow: 0 0 26px rgba(53, 210, 255, .5), inset 0 0 20px rgba(53, 210, 255, .3);
+  transform: translate(-50%, -50%) scale(.12);
+  opacity: 0;
+  animation: launch-ring calc(1.15s * var(--st)) cubic-bezier(.18, .7, .25, 1) both;
+}
+.intro-loader.is-launching .intro-burst span:nth-child(1) { animation-delay: calc(.9s * var(--st)); }
+.intro-loader.is-launching .intro-burst span:nth-child(2) {
+  animation-delay: calc(1.18s * var(--st));
+  border-color: rgba(255, 120, 165, .75);
+  box-shadow: 0 0 26px rgba(245, 50, 75, .45), inset 0 0 18px rgba(245, 50, 75, .25);
+}
+.intro-loader.is-launching .intro-burst span:nth-child(3) { animation-delay: calc(1.42s * var(--st)); border-width: 1.5px; }
+@keyframes launch-ring {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.12); }
+  10%  { opacity: .95; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.7); }
+}
+
+/* 리그: 아주 미세한 카메라 틸트만 — 직선 가속의 긴장감 */
+.intro-loader.is-launching .intro-word {
+  animation: rig-sweep calc(2.55s * var(--st)) cubic-bezier(.7, 0, .3, 1) both;
+}
+@keyframes rig-sweep {
+  0%   { transform: rotateX(0); }
+  38%  { transform: rotateX(2.5deg) translateZ(-40px); }
+  100% { transform: rotateX(-2deg) translateZ(60px); }
+}
+
+/* 글자는 회전 없이 한 덩어리로 직진 줌-스루 —
+   긴 숨 고르기(뒤로 물러남) → 점진 가속 → 카메라 통과.
+   중후함은 앞 절반의 느린 호흡이, 속도감은 마지막 통과 구간이 담당 */
+.intro-loader.is-launching .intro-word span {
+  animation: word-launch calc(2.15s * var(--st)) cubic-bezier(.55, 0, .8, .35) calc(var(--i) * 50ms * var(--st)) both;
+  will-change: transform, opacity, filter;
+}
+@keyframes word-launch {
+  0% {
+    opacity: 1;
+    transform: translateZ(0) translateX(0);
+  }
+  /* 숨 고르기: 천천히 뒤로 물러나며 긴장을 쌓는다 */
+  34% {
+    opacity: 1;
+    transform: translateZ(-110px) translateX(calc((var(--i) - 2.5) * -.02em));
+  }
+  /* 정지점 — 한 박자 머물고 */
+  48% {
+    opacity: 1;
+    transform: translateZ(-118px) translateX(calc((var(--i) - 2.5) * -.022em));
+  }
+  /* 발사: 자간이 벌어지며 점진 가속 */
+  74% {
+    opacity: 1;
+    transform: translateZ(300px) translateX(calc((var(--i) - 2.5) * .08em));
+  }
+  92% { opacity: .9; }
+  100% {
+    opacity: 0;
+    transform: translateZ(1500px) translateX(calc((var(--i) - 2.5) * .46em));
+  }
+}
+
+/* 워프 터널 대신 — 아나모픽 렌즈 스트릭 (수평 광선 익스팬션) */
+.intro-loader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(46% 2.2% at 50% 47%, rgba(255, 255, 255, .9), rgba(53, 210, 255, .35) 45%, transparent 75%),
+    radial-gradient(20% 7% at 50% 47%, rgba(170, 235, 255, .5), transparent 70%),
+    radial-gradient(8% 16% at 50% 47%, rgba(255, 255, 255, .35), transparent 70%);
+}
+.intro-loader.is-launching::after {
+  animation: lens-streak calc(1.2s * var(--st)) cubic-bezier(.4, 0, .6, 1) calc(1.05s * var(--st)) both;
+}
+@keyframes lens-streak {
+  0%   { opacity: 0; transform: scaleX(.12); filter: blur(2px); }
+  30%  { opacity: 1; }
+  100% { opacity: 0; transform: scaleX(2.3); filter: blur(6px); }
+}
+
+/* 핸드오프 순간의 빛 플래시 */
+.launch-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(58% 58% at 50% 46%, rgba(240, 252, 255, .95), rgba(53, 210, 255, .28) 46%, transparent 74%);
+}
+.intro-loader.is-launching .launch-flash {
+  animation: launch-flash calc(.85s * var(--st)) var(--ease-out) calc(1.9s * var(--st)) both;
+}
+@keyframes launch-flash {
+  0%   { opacity: 0; transform: scale(.55); }
+  22%  { opacity: .85; }
+  100% { opacity: 0; transform: scale(1.75); }
+}
+
+/* 타이포 연출이 완전히 끝난 뒤(플래시 하강세에서 핸드오프) 지도 씬이 돌리-인
+   (배경은 고정 — 사각형 가장자리가 드러나지 않도록) */
+.stage.intro-ready > .map-wrap {
+  animation: scene-dolly calc(2.2s * var(--tscale)) cubic-bezier(.2, .75, .22, 1) calc(.35s * var(--tscale)) both;
+  will-change: transform, opacity;
+}
+@keyframes scene-dolly {
+  /* 심우주에서 출발 — 이후 한 방향으로 감속만 한다 (역방향·바운스 없음, blur 없음) */
+  0% {
+    opacity: 0;
+    transform: perspective(1300px) translateZ(-2600px) rotateX(42deg) rotateY(-14deg);
+  }
+  16% { opacity: 1; }
+  100% {
+    opacity: 1;
+    transform: perspective(1300px) translateZ(0) rotateX(0deg) rotateY(0deg);
+  }
+}
+
+/* 빈 화면 위로 하얀 선이 성남 외곽을 그리고 → 번쩍 이그나이트 → 지도 완성 */
+.stage.intro-ready .outer-border {
+  /* 드로잉 동안 필터 완전 제거 — 복잡 패스에 drop-shadow 애니메이션은 프레임 드롭 주범 */
+  filter: none;
+  will-change: stroke-dashoffset;
+  stroke-dasharray: 1;
+  animation:
+    border-draw calc(1.2s * var(--tscale)) cubic-bezier(.45, .05, .3, .95) calc(2.4s * var(--tscale)) backwards,
+    border-flash calc(1.7s * var(--tscale)) ease-out calc(3.6s * var(--tscale)) backwards;
+}
+@keyframes border-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+/* 시퀀스가 끝난 뒤 정적 글로우 복원 — 한 번만 적용, 애니메이션 없음 */
+.stage.is-settled .outer-border {
+  filter:
+    drop-shadow(0 0 1.5px rgba(53, 210, 255, .8))
+    drop-shadow(0 0 22px rgba(53, 210, 255, .16))
+    drop-shadow(0 30px 60px rgba(0, 0, 0, .55));
+}
+/* 0% 프레임이 드로잉 구간 내내 적용됨(backwards): 하얀 선 + 속이 빈 지도 */
+@keyframes border-flash {
+  0% {
+    fill: rgba(9, 16, 29, 0);
+    stroke: rgba(255, 255, 255, .96);
+    stroke-width: 3;
+  }
+  14% {
+    fill: rgba(9, 16, 29, .4);
+    stroke: rgba(255, 255, 255, 1);
+    stroke-width: 3.8;
+  }
+  30% {
+    fill: rgba(9, 16, 29, .6);
+    stroke: rgba(150, 195, 255, .5);
+  }
+  44% {
+    fill: rgba(9, 16, 29, .68);
+    stroke: rgba(225, 248, 255, 1);
+    stroke-width: 3.2;
+  }
+  58% {
+    stroke: rgba(150, 195, 255, .45);
+  }
+  72% {
+    stroke: rgba(235, 250, 255, .95);
+    stroke-width: 2.8;
+  }
+  100% {
+    fill: rgba(9, 16, 29, .72);
+    stroke: rgba(150, 195, 255, .4);
+    stroke-width: 2.4;
+  }
+}
+
+/* 외곽선 완성 순간, 5개 영역이 빛과 함께 차오른다 */
+.stage.intro-ready .map-shell svg > g[clip-path] {
+  animation: map-fill-in calc(1.2s * var(--tscale)) var(--ease-out) calc(3.72s * var(--tscale)) backwards;
+}
+@keyframes map-fill-in {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* 영역 점화와 동시에 지도 뒤에서 퍼지는 에너지 블롤 */
+.stage.intro-ready .map-shell::after {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  z-index: -1;
+  background: radial-gradient(50% 50% at 50% 48%, rgba(53, 210, 255, .32), rgba(138, 63, 252, .12) 55%, transparent 76%);
+  filter: blur(16px);
+  pointer-events: none;
+  animation: map-bloom calc(1.5s * var(--tscale)) var(--ease-out) calc(3.7s * var(--tscale)) both;
+}
+@keyframes map-bloom {
+  0%   { opacity: 0; transform: scale(.55); }
+  28%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+
+/* ============================================================
+   부속 액션 — 시퀀스의 각 비트를 장식하는 화려한 액센트
+   ============================================================ */
+/* ① 코몛 헤드 — 외곽선을 그리는 빛 머리가 선을 따라 달린다 */
+.border-comet {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6.5;
+  stroke-linecap: round;
+  stroke-dasharray: .028 .972;
+  opacity: 0;
+  pointer-events: none;
+}
+.stage.intro-ready .border-comet {
+  animation: comet-travel calc(1.2s * var(--tscale)) cubic-bezier(.45, .05, .3, .95) calc(2.4s * var(--tscale)) both;
+}
+@keyframes comet-travel {
+  0%   { opacity: 0; stroke-dashoffset: 1.028; }
+  5%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { opacity: 0; stroke-dashoffset: .028; }
+}
+
+/* ② 점화 쇼크웨이브 — 외곽 완성 순간 지도 중심에서 퍼지는 링 2겹 */
+.ignite-ring {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 34%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2.5px solid rgba(170, 235, 255, .95);
+  box-shadow: 0 0 34px rgba(53, 210, 255, .55), inset 0 0 26px rgba(53, 210, 255, .4);
+  transform: translate(-50%, -50%) scale(.16);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.ignite-ring.two {
+  border-width: 1.5px;
+  border-color: rgba(255, 130, 170, .8);
+  box-shadow: 0 0 30px rgba(245, 50, 75, .45);
+}
+.stage.intro-ready .ignite-ring { animation: ignite-ring calc(1.5s * var(--tscale)) cubic-bezier(.16, .7, .25, 1) calc(3.65s * var(--tscale)) both; }
+.stage.intro-ready .ignite-ring.two { animation-duration: calc(1.9s * var(--tscale)); animation-delay: calc(3.82s * var(--tscale)); }
+@keyframes ignite-ring {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.16); }
+  10%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.4); }
+}
+
+/* ③ 글레어 스윙 — 컴러가 차오른 직후 지도 위를 쓸고 가는 빛 */
+.sheen-layer { pointer-events: none; }
+.sheen {
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.stage.intro-ready .sheen {
+  animation: sheen-sweep calc(1.25s * var(--tscale)) cubic-bezier(.35, 0, .3, 1) calc(3.95s * var(--tscale)) both;
+}
+@keyframes sheen-sweep {
+  0%   { opacity: 0; transform: translateX(0); }
+  12%  { opacity: .9; }
+  88%  { opacity: .8; }
+  100% { opacity: 0; transform: translateX(1320px); }
+}
+
+/* ④ 영역 순차 점화 팝 — 백열로 켜졌다가 제 색으로 안착 */
+.district[data-id="youth"] { --di: 0; }
+.district[data-id="renovation"] { --di: 1; }
+.district[data-id="market"] { --di: 2; }
+.district[data-id="enterprise"] { --di: 3; }
+.district[data-id="senior"] { --di: 4; }
+.stage.intro-ready:not(.complete) .map-shell svg .district {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: district-pop calc(.85s * var(--tscale)) var(--ease-out) calc((3.72s + var(--di, 0) * .09s) * var(--tscale)) backwards;
+}
+@keyframes district-pop {
+  0%   { opacity: 0; transform: scale(.9); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ⑤ 라벨 드롭-인 — 지도가 정착한 뒤, 타이포가 하나씩 떨어져 내려앉는다 */
+.stage.intro-ready:not(.complete) .district .label {
+  transform-box: fill-box;
+  transform-origin: 50% 100%; /* 발바닥 기준 — 착지 눌림이 자연스럽게 */
+  /* 높은 데서 중력 가속으로 낙하 → 쿵 착지 후 살짝 눌렸다 복귀 */
+  animation: label-drop .62s cubic-bezier(.55, 0, .85, .45) calc((4.75s + var(--di, 0) * .18s) * var(--tscale)) backwards;
+}
+@keyframes label-drop {
+  0% { opacity: 0; translate: 0 -340px; scale: 1.6; }
+  10% { opacity: 1; }
+  /* 쿵 — 착지 */
+  72% { translate: 0 0; scale: 1; animation-timing-function: cubic-bezier(.2, .9, .3, 1.4); }
+  /* 충격으로 살짝 눌림 */
+  84% { translate: 0 7px; scale: 1.04 .92; }
+  100% { opacity: 1; translate: 0 0; scale: 1; }
+}
+
+/* ============================================================
+   반응형
+   ============================================================ */
+@media (max-width: 1100px) {
+  header { max-width: min(420px, 52vw); }
+  .progress { width: min(260px, 38vw); }
+}
+
+@media (max-width: 760px) {
+  body { overflow-y: auto; }
+  .stage { height: auto; min-height: 100dvh; padding: 24px 18px 40px; }
+
+  header, .city-logo-badge, .progress, .test-run, .hint, .credit {
+    position: static;
+    transform: none;
+  }
+  header { max-width: none; margin-top: 8px; }
+  .city-logo-badge { display: inline-block; margin-top: 18px; }
+  .progress { width: 100%; margin-top: 22px; }
+  .map-wrap { position: static; margin-top: 10px; }
+  .map-shell { width: 100%; }
+  .district .label { font-size: 38px; }
+  .district .caption { font-size: 18px; }
+  .test-run { margin-top: 18px; }
+  .hint { white-space: normal; margin-top: 16px; text-align: center; }
+  .credit { display: block; margin-top: 10px; text-align: center; }
+}
+
+/* 접근성: 모션 최소화 설정 시 — 무한 장식 루프만 끈다.
+   원-샷 시네마틱 시퀀스(인트로·드로잉·점화)는 이 작품의 본질이므로 유지.
+   (이전처럼 전부 즉시-완료시키면 OS에서 Reduce Motion이 켜진 사용자에게
+   "순간이동"으로 보이는 버그가 된다) */
+@media (prefers-reduced-motion: reduce) {
+  .stage *,
+  .stage *::before,
+  .stage *::after,
+  .intro-loader *,
+  .intro-loader::after {
+    animation-iteration-count: 1 !important;
+  }
+}

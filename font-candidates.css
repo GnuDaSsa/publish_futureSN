@@ -1,0 +1,39 @@
+/* 인트로 타이틀 폰트 후보 @font-face 모음
+   — 실제로 사용된 폰트만 다운로드되므로 항상 로드해도 가볍다 */
+
+@font-face {
+  font-family: 'GmarketSans';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff') format('woff');
+  font-weight: 800;
+  font-display: block;
+}
+@font-face {
+  font-family: 'SBAggro';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff') format('woff');
+  font-weight: 800;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Giants';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/Giants-Bold.woff2') format('woff2');
+  font-weight: 800;
+  font-display: block;
+}
+@font-face {
+  font-family: 'GongGothic';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicBold.woff') format('woff');
+  font-weight: 800;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Cafe24Ssurround';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff') format('woff');
+  font-weight: 800;
+  font-display: block;
+}
+@font-face {
+  font-family: 'SUIT';
+  src: url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/static/woff2/SUIT-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-display: block;
+}

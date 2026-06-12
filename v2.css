@@ -1,0 +1,854 @@
+/* ============================================================
+   v2.css — 취임식 디지털 퍼포먼스 확장
+   styles.css(v1 확정) 위에 얹는 오버라이드 + 신규 연출
+   ============================================================ */
+
+/* ---------- 분야 6색 (콘티 톤 × v1 뮤트 팔레트) ---------- */
+:root {
+  --senior:     #8cc7ab;  /* 어르신·복지 — 소프트 그린 (v1 유지) */
+  --baby:       #e8a0bf;  /* 영유아·엄마 — 뮤트 핑크 */
+  --youth:      #a9cf8e;  /* 청년 — 라이트 그린 */
+  --enterprise: #8db4dd;  /* 기업 — 테크 블루 (v1 유지) */
+  --market:     #e2a877;  /* 소상공인 — 따뜻한 주황 */
+  --redev:      #ddc290;  /* 재개발·재건축 — 황금빛 (v1 샌드 골드) */
+}
+
+/* ---------- 미점등 지도: 우주 배경을 그대로 공유 ----------
+   본체 어두운 채움 제거(!important — 키프레임 fill까지 이김),
+   내부 경계선은 점등 전 투명, 점등 후에만 옅게 */
+.outer-border { fill: transparent !important; }
+.district .base { stroke: transparent; }
+.district.done .base { stroke: rgba(255, 255, 255, .22); }
+
+/* ---------- 워드마크: 클릭 = 통합 화면으로 점프 (유일하게 허용된 마우스 입력) ---------- */
+.test-run { pointer-events: auto; cursor: pointer; }
+
+/* ---------- 인트로 줌-스루: 정면 중앙 관통 ----------
+   기존은 리그 틸트(rotateX -2도)와 원근 한계(1000px) 초과 가속이 겹쳐
+   글자가 중하단으로 빠져나갔다 — 틸트 제거 + 원근 안쪽 가속으로 재정의 */
+.intro-loader { perspective-origin: 50% 47%; }
+@keyframes rig-sweep {
+  0%   { transform: rotateX(0); }
+  38%  { transform: rotateX(1.2deg) translateZ(-40px); }
+  100% { transform: rotateX(0) translateZ(40px); }
+}
+@keyframes word-launch {
+  0% {
+    opacity: 1;
+    transform: translateZ(0) translateX(0);
+  }
+  34% {
+    opacity: 1;
+    transform: translateZ(-110px) translateX(calc((var(--i) - 2.5) * -.02em));
+  }
+  48% {
+    opacity: 1;
+    transform: translateZ(-118px) translateX(calc((var(--i) - 2.5) * -.022em));
+  }
+  74% {
+    opacity: 1;
+    transform: translateZ(280px) translateX(calc((var(--i) - 2.5) * .08em));
+  }
+  92% { opacity: .85; }
+  100% {
+    opacity: 0;
+    transform: translateZ(940px) translateX(calc((var(--i) - 2.5) * .42em));
+  }
+}
+
+/* ---------- 점화 팝 순서 재배정 (6분야) ---------- */
+.district[data-id="market"]     { --di: 0; }
+.district[data-id="redev"]      { --di: 1; }
+.district[data-id="baby"]       { --di: 2; }
+.district[data-id="senior"]     { --di: 3; }
+.district[data-id="youth"]      { --di: 4; }
+.district[data-id="enterprise"] { --di: 5; }
+
+/* 라벨 세로 보정 — 새 6분할 기준으로 전 분야 동일 베이스라인 */
+.district[data-id="youth"] .label,
+.district[data-id="enterprise"] .label,
+.district[data-id="market"] .label { transform: translateY(-26px); }
+/* 영유아·엄마 — 좁아진 상단 우측 셀에 맞춰 살짝 축소 */
+.district[data-id="baby"] .label { font-size: 27px; }
+
+/* 점등 순서 엄수: 영상 전 active 밝기 상승 사용 안 함 (혼동 방지) */
+.district.active .base { fill-opacity: 0; filter: none; }
+
+/* ---------- 라벨: 사용 안 함 (유저 결정 — 지도 위 분야 문구 제거. 되살리려면 이 줄만 삭제) ---------- */
+.district .label { display: none; }
+
+/* (라벨 복원 시를 위한 낙하 연출 보존) */
+.stage.intro-ready:not(.complete) .district:not(.done) .label { animation: none; }
+.district .label { opacity: 0; }
+.stage .district.done .label,
+.stage.intro-ready:not(.complete) .district.done .label {
+  opacity: 1;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: label-drop .62s cubic-bezier(.55, 0, .85, .45) calc(1.05s * var(--tscale)) backwards;
+}
+
+/* 점등: 급한 점화 대신 부드러운 페이드인 (색이 사아악 들어온다) */
+.district.done .base {
+  animation: district-fadein calc(1.9s * var(--tscale)) var(--ease-soft) both;
+}
+@keyframes district-fadein {
+  from { fill-opacity: 0; }
+  to   { fill-opacity: .8; }
+}
+
+/* 점등 이후 숨쉬는 지도 — 일렁임/반짝임 (transform·opacity만 — 하드런 교훈) */
+.stage.alive:not(.complete) .sheen {
+  animation: sheen-roam 7.5s cubic-bezier(.35, 0, .3, 1) 2.2s infinite;
+}
+@keyframes sheen-roam {
+  0%   { opacity: 0; transform: translateX(0); }
+  6%   { opacity: .6; }
+  22%  { opacity: .5; }
+  30%  { opacity: 0; transform: translateX(1320px); }
+  100% { opacity: 0; transform: translateX(1320px); }
+}
+.stage.alive:not(.complete) .map-shell::after {
+  animation: bloom-breathe 5.2s ease-in-out 1.6s infinite;
+}
+@keyframes bloom-breathe {
+  0%, 100% { opacity: .18; transform: scale(1.02); }
+  50%      { opacity: .62; transform: scale(1.18); }
+}
+
+/* 점등 구역 위 반짝이 스파크 — 필터 없는 경량 점, transform·opacity만 */
+.district .spark {
+  fill: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.district.done .spark {
+  animation: spark-twinkle 3.2s ease-in-out calc(var(--si, 0) * 1.07s + 1.8s) infinite;
+}
+@keyframes spark-twinkle {
+  0%, 100% { opacity: 0; transform: scale(.35); }
+  10%      { opacity: .95; transform: scale(1.2); }
+  26%      { opacity: 0; transform: scale(.45); }
+}
+
+/* 무대 연출용 앨비언트는 OS '동작 줄이기'에서도 계속 돌아야 한다
+   (styles.css의 iteration-count:1 제한 예외 — LED 무대 화면은 접근성 대상이 아님) */
+@media (prefers-reduced-motion: reduce) {
+  .stage.alive:not(.complete) .sheen,
+  .stage.alive:not(.complete) .map-shell::after,
+  .stage .district.done .spark {
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* ---------- 운영 중 마우스 인터랙션 전면 비활성 (키보드 전용) ---------- */
+.district { pointer-events: none; cursor: default; }
+.district:hover .base { fill-opacity: 0; filter: none; }
+.district.done:hover .base {
+  fill-opacity: .8;
+  filter: drop-shadow(0 0 10px var(--color)) drop-shadow(0 0 30px var(--color));
+}
+
+/* ---------- 통합 수렴: 6번째 분야 딜레이. 타이틀 타이포는 생략 — 화이트아웃 → 곧장 통합 영상 (겹침 방지) ---------- */
+.stage.complete .district:nth-child(6) { animation-delay: .85s; }
+/* 통합 시퀀스 중간의 "살짝 어두워짐" 제거 — 어두운 백드롭 없이 하이라이트/화이트아웃만 */
+.completion { background: none; }
+.completion h2 { display: none; }
+
+/* ============================================================
+   풀스크린 미디어 레이어 (오프닝 / 통합 마무리 영상)
+   ============================================================ */
+.media-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .55s var(--ease-soft), visibility 0s .55s;
+}
+.media-layer.show {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .3s var(--ease-soft);
+}
+.media-layer video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* ---------- 데모 카드 (시댄스 영상 자리) ---------- */
+.demo-card {
+  position: relative;
+  width: min(76vw, 1240px);
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  border: 1px solid rgba(150, 195, 255, .22);
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .025) 0 14px, transparent 14px 28px),
+    radial-gradient(70% 90% at 50% 10%, color-mix(in srgb, var(--color, var(--cyan)) 10%, transparent), transparent 70%),
+    #04070d;
+}
+.demo-chip {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .34em;
+  color: var(--color, var(--cyan));
+  border: 1px solid color-mix(in srgb, var(--color, var(--cyan)) 55%, transparent);
+  border-radius: 999px;
+  padding: 4px 14px 4px 18px;
+}
+.demo-card strong {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(28px, 3.8vw, 58px);
+  letter-spacing: -.01em;
+  color: var(--ink);
+}
+.demo-card em {
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1vw, 14px);
+  letter-spacing: .12em;
+  color: var(--ink-faint);
+}
+.demo-bar {
+  width: 34%;
+  height: 3px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  overflow: hidden;
+}
+.demo-bar span {
+  display: block;
+  height: 100%;
+  background: var(--color, var(--cyan));
+  box-shadow: 0 0 12px var(--color, var(--cyan));
+  transform-origin: left;
+  transform: scaleX(0);
+  animation: demo-progress linear both;
+}
+@keyframes demo-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ============================================================
+   ① 수렴형 타이포 레이어 (시민 선언)
+   ============================================================ */
+.typo-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .6s ease; /* 타이포 퀴어감도 펙 아닌 페이드로 */
+}
+.typo-layer.show { opacity: 1; }
+
+/* 전문 워드 스트림 */
+.typo-quote {
+  margin: 0;
+  max-width: 74vw;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: .3em .42em;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 3.3vw, 52px);
+  line-height: 1.3;
+  color: var(--ink);
+  text-shadow: 0 3px 14px rgba(0, 0, 0, .75), 0 8px 46px rgba(2, 4, 9, .9);
+}
+.typo-layer.mayor .typo-quote { font-size: clamp(30px, 4vw, 64px); }
+.typo-quote span {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(calc(var(--jx, 0) * 34px), calc(var(--jy, 0) * 26px + 34px)) scale(1.08);
+  filter: blur(8px);
+}
+.typo-quote.in span {
+  transition:
+    opacity .5s var(--ease-out),
+    transform .6s var(--ease-out),
+    filter .5s var(--ease-out);
+  transition-delay: calc(var(--wi, 0) * .08s * var(--tscale));
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+/* 응집 — 중심으로 빨려들며 소멸 */
+.typo-quote.converge span {
+  transition:
+    transform .58s cubic-bezier(.6, 0, .85, .4),
+    opacity .5s ease .08s,
+    filter .45s ease;
+  transition-delay: calc(var(--wi, 0) * .012s);
+  transform: translate(var(--cx, 0), var(--cy, 0)) scale(.08);
+  opacity: 0;
+  filter: blur(5px);
+}
+
+/* ===== 전문 등장 베리에이션 — 분야마다 다른 결로 등장 (cues.js TYPO_VARIANT) =====
+   최종 상태는 공통(.typo-quote.in span)이 처리 — 변형은 시작 상태와 이징만 바꾼다 */
+
+/* v-rise = 기본(흩어진 채 떠오름) — 추가 규칙 없음 */
+
+/* v-fall — 위에서 사뿟이 내려앉는다 (영유아·엄마) */
+.typo-quote.v-fall:not(.in) span {
+  transform: translate(calc(var(--jx, 0) * 18px), calc(var(--jy, 0) * -12px - 48px)) scale(.94) rotate(calc(var(--jx, 0) * 5deg));
+  filter: blur(6px);
+}
+.typo-quote.v-fall.in:not(.converge) span {
+  transition:
+    opacity .55s var(--ease-out),
+    transform .72s cubic-bezier(.22, .9, .32, 1.16),
+    filter .55s var(--ease-out);
+  transition-delay: calc(var(--wi, 0) * .075s * var(--tscale));
+}
+
+/* v-slide — 오른쪽에서 속도감 있게 미끄러져 정렬 (청년) */
+.typo-quote.v-slide:not(.in) span {
+  transform: translateX(calc(72px + var(--jx, 0) * 26px)) skewX(-8deg);
+  filter: blur(5px);
+}
+.typo-quote.v-slide.in:not(.converge) span {
+  transition:
+    opacity .42s var(--ease-out),
+    transform .54s cubic-bezier(.18, .85, .25, 1),
+    filter .4s var(--ease-out);
+  transition-delay: calc(var(--wi, 0) * .06s * var(--tscale));
+}
+
+/* v-focus — 큰 블러에서 초점이 맞아 들어온다 (기업) */
+.typo-quote.v-focus:not(.in) span {
+  transform: scale(1.55);
+  filter: blur(14px);
+}
+.typo-quote.v-focus.in:not(.converge) span {
+  transition:
+    opacity .6s ease,
+    transform .68s var(--ease-out),
+    filter .62s ease;
+  transition-delay: calc(var(--wi, 0) * .055s * var(--tscale));
+}
+
+/* v-tilt — 접힌 면이 아래에서 위로 펼쳐진다 (소상공인) */
+.typo-quote.v-tilt { perspective: 760px; }
+.typo-quote.v-tilt:not(.in) span {
+  transform: translateY(18px) rotateX(82deg);
+  transform-origin: 50% 100%;
+  filter: blur(3px);
+}
+.typo-quote.v-tilt.in:not(.converge) span {
+  transition:
+    opacity .5s var(--ease-out),
+    transform .66s cubic-bezier(.2, .75, .3, 1.12),
+    filter .5s var(--ease-out);
+  transition-delay: calc(var(--wi, 0) * .07s * var(--tscale));
+}
+
+/* v-build — 바닥선에서 솟아오르며 일어선다 (재개발·재건축)
+   클립 리빌은 텍스트 섀도가 사각형으로 잘려 글자마다 박스가 보이는 문제가 있어
+   scaleY 기립(건물 올라가는 느낌)으로 교체 */
+.typo-quote.v-build span { transform-origin: 50% 100%; }
+.typo-quote.v-build:not(.in) span {
+  transform: translateY(34px) scaleY(.25);
+  filter: none;
+}
+.typo-quote.v-build.in:not(.converge) span {
+  transition:
+    opacity .4s ease,
+    transform .62s var(--ease-out),
+    filter .4s ease;
+  transition-delay: calc(var(--wi, 0) * .08s * var(--tscale));
+}
+
+/* v-strike — 크게서 단숨에 내리꽂힌다 (시장 클라이맥스) */
+.typo-quote.v-strike:not(.in) span {
+  transform: scale(2.3);
+  filter: blur(10px);
+}
+.typo-quote.v-strike.in:not(.converge) span {
+  transition:
+    opacity .34s ease,
+    transform .44s cubic-bezier(.16, .9, .27, 1),
+    filter .38s ease;
+  transition-delay: calc(var(--wi, 0) * .09s * var(--tscale));
+}
+
+/* 키워드 결정(結晶) */
+.typo-kw {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+}
+.kw-text {
+  grid-area: 1 / 1;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(54px, 7.5vw, 132px);
+  letter-spacing: -.015em;
+  white-space: nowrap;
+  background: linear-gradient(120deg, #fff 25%, color-mix(in srgb, var(--color, var(--cyan)) 80%, #fff) 60%, var(--color, var(--cyan)));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+}
+.typo-layer.mayor .kw-text { font-size: clamp(64px, 9vw, 168px); }
+.typo-kw.in .kw-text {
+  animation: kw-strike calc(.72s * var(--tscale)) var(--ease-out) both;
+}
+@keyframes kw-strike {
+  0% {
+    opacity: 0;
+    transform: scale(2.2);
+    filter: blur(16px);
+  }
+  55% { opacity: 1; filter: blur(0); }
+  74% { transform: scale(.96); }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0) drop-shadow(0 6px 16px rgba(0, 0, 0, .55)) drop-shadow(0 0 38px color-mix(in srgb, var(--color, var(--cyan)) 55%, transparent));
+  }
+}
+.kw-ring {
+  grid-area: 1 / 1;
+  width: 26vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--color, var(--cyan)) 80%, #fff);
+  opacity: 0;
+  pointer-events: none;
+}
+.typo-kw.in .kw-ring { animation: kw-ring calc(1.15s * var(--tscale)) var(--ease-out) both; }
+.typo-kw.in .kw-ring.two { animation-delay: calc(.14s * var(--tscale)); border-width: 1px; }
+@keyframes kw-ring {
+  0%   { opacity: .95; transform: scale(.22); }
+  100% { opacity: 0; transform: scale(2.8); }
+}
+/* 키워드 → 구역 비행 — 이동이 눈에 보이도록 길고 부드럽게, 페이드는 뒤닮아 (깜박임 방지) */
+.typo-kw.fly .kw-text {
+  animation: none;
+  transition:
+    transform calc(1.25s * var(--tscale)) cubic-bezier(.45, 0, .3, 1),
+    opacity calc(.75s * var(--tscale)) ease calc(.5s * var(--tscale)),
+    filter calc(1.1s * var(--tscale)) ease;
+  transform: translate(var(--fx, 0), var(--fy, 0)) scale(.05);
+  opacity: 0;
+  filter: blur(2px);
+}
+
+/* ============================================================
+   ② 구역에서 확장되는 영상 프레임
+   ============================================================ */
+.video-layer { z-index: 50; }
+.video-layer.on {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 4, 9, .55);
+  transition: background .5s ease;
+}
+.video-frame {
+  position: relative;
+  width: min(64vw, 1180px);
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(150, 195, 255, .3);
+  background: #04070d;
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, .55),
+    0 0 70px color-mix(in srgb, var(--color, var(--cyan)) 22%, transparent);
+  transition:
+    transform calc(.7s * var(--tscale)) cubic-bezier(.2, .8, .25, 1),
+    opacity calc(.5s * var(--tscale)) ease;
+  will-change: transform, opacity;
+}
+.video-frame.shrink {
+  transition:
+    transform calc(.6s * var(--tscale)) cubic-bezier(.6, 0, .85, .4),
+    opacity calc(.55s * var(--tscale)) ease .05s;
+}
+.vf-chip {
+  position: absolute;
+  top: -15px;
+  left: 20px;
+  z-index: 2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .04em;
+  color: var(--color, var(--cyan));
+  background: #04070d;
+  border: 1px solid color-mix(in srgb, var(--color, var(--cyan)) 50%, transparent);
+  border-radius: 999px;
+  padding: 3px 14px;
+}
+.vf-media {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+}
+.vf-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+.vf-media .demo-card {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: none;
+}
+
+/* ============================================================
+   진행 카운터
+   ============================================================ */
+.field-counter {
+  position: fixed;
+  top: 26px;
+  right: 30px;
+  z-index: 45;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: .22em;
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 16px 7px 20px;
+  background: rgba(4, 8, 14, .5);
+  opacity: 0;
+  translate: 0 -8px;
+  transition: opacity .5s var(--ease-out), translate .5s var(--ease-out);
+  pointer-events: none;
+}
+.field-counter.on { opacity: 1; translate: 0 0; }
+body.world-mode .field-counter { opacity: 0; }
+
+/* ============================================================
+   화이트 플래시 (시장 큐 → 세계지도 디졸브)
+   ============================================================ */
+.cue-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 280;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(62% 62% at 50% 46%, #fff, rgba(235, 250, 255, .92) 38%, rgba(53, 210, 255, .35) 68%, transparent 88%);
+}
+.cue-flash.go {
+  animation: cue-flash calc(1.4s * var(--tscale)) var(--ease-soft) both;
+}
+@keyframes cue-flash {
+  0%   { opacity: 0; transform: scale(.6); }
+  28%  { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 0; transform: scale(2.3); }
+}
+
+/* ============================================================
+   블랙아웃 (B 키)
+   ============================================================ */
+.blackout {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: #000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .45s ease, visibility 0s .45s;
+}
+.blackout.on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .45s ease;
+}
+
+/* ============================================================
+   인트로 프롤로그 (v2.1) — 파티클 결집 동안 버튼/카운터는 정리
+   ============================================================ */
+.intro-loader.is-charging .intro-enter,
+.intro-loader.is-charging .intro-percent,
+.intro-loader.is-charging .intro-progress {
+  opacity: 0;
+  transition: opacity .5s ease;
+  pointer-events: none;
+}
+
+/* ============================================================
+   통합 완료 → 시장 선언 대기 앰비언트 (v2.1)
+   ============================================================ */
+.await-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .8s var(--ease-soft);
+}
+.await-layer.on { opacity: 1; }
+.await-ring {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  width: 34vmin;
+  height: 34vmin;
+  margin: -17vmin 0 0 -17vmin;
+  border: 1px solid rgba(53, 210, 255, .55);
+  border-radius: 50%;
+  opacity: 0;
+  animation: await-ripple 4.2s cubic-bezier(.2, .6, .4, 1) infinite;
+}
+.await-ring.r2 { animation-delay: 1.4s; }
+.await-ring.r3 { animation-delay: 2.8s; }
+@keyframes await-ripple {
+  0%   { transform: scale(.5); opacity: 0; }
+  16%  { opacity: .5; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.await-copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 7vh;
+  text-align: center;
+}
+.await-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(20px, 2vw, 36px);
+  color: #dff4ff;
+  text-shadow: 0 0 26px rgba(53, 210, 255, .35);
+  opacity: 0;
+  translate: 0 14px;
+  transition: opacity 1s var(--ease-out) .7s, translate 1s var(--ease-out) .7s;
+}
+.await-sub {
+  margin: 13px 0 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(13px, 1vw, 17px);
+  letter-spacing: .3em;
+  text-indent: .3em;
+  color: var(--ink-dim);
+  opacity: 0;
+  transition: opacity 1.2s ease 2.2s;
+}
+.await-layer.on .await-line { opacity: 1; translate: 0 0; }
+.await-layer.on .await-sub { opacity: 1; animation: await-breathe 3s ease-in-out 3.6s infinite; }
+@keyframes await-breathe {
+  0%, 100% { opacity: .4; }
+  50%      { opacity: 1; }
+}
+
+/* ============================================================
+   라스트 — 세계지도 속 성남
+   ============================================================ */
+.world-finale {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-start; /* 지도를 위로 — 라스트 씬 상단 여백 축소 */
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.3s var(--ease-soft), visibility 0s 1.3s;
+}
+.world-finale.show {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 1.1s var(--ease-soft);
+}
+.world-finale svg {
+  /* 풀블리드 — 화면을 가득 채우고, 넘치는 좌우(또는 상하)는 크롭 (slice) */
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  overflow: hidden; /* 성남 중심 재구성 시 테두리 밖 대륙 크롭 */
+}
+#worldLand {
+  stroke: rgba(140, 215, 255, .75);
+  stroke-width: 1;
+  fill: rgba(53, 210, 255, 0);
+}
+.world-finale.lit #worldLand {
+  fill: rgba(53, 210, 255, .045);
+  stroke: rgba(140, 215, 255, .5);
+  transition: fill 1.6s ease, stroke 1.6s ease;
+}
+
+/* 성남 마커 — 성남 지도 형상이 밝게 빛나고, 주위로 오라만 숨쉴다 */
+#snMarker { opacity: 0; }
+.world-finale.lit #snMarker { opacity: 1; transition: opacity .9s ease; }
+.sn-shape {
+  fill: #eafaff;
+  stroke: #fff;
+  stroke-width: 80; /* scale(.012) 기준 ≈ 1px */
+  /* 글로우는 정적 — 펄스 애니메이션은 오라 원이 담당 (하드런 교훈) */
+  filter: drop-shadow(0 0 5px var(--cyan)) drop-shadow(0 0 14px var(--cyan));
+}
+.sn-aura {
+  fill: url(#snAuraGrad);
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: .8;
+}
+.world-finale.lit .sn-aura { animation: sn-aura 3.4s ease-in-out infinite; }
+@keyframes sn-aura {
+  0%, 100% { transform: scale(1); opacity: .8; }
+  50%      { transform: scale(1.45); opacity: 1; }
+}
+
+/* 중심 파동 — 성남에서 와이파이처럼 퍼지는 원형 리플 (중앙 정착 이후) */
+.sn-ripple {
+  fill: none;
+  stroke: var(--cyan);
+  vector-effect: non-scaling-stroke;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.world-finale.centered .sn-ripple { animation: sn-ripple 3.6s cubic-bezier(.2, .55, .45, 1) infinite; }
+.world-finale.centered .sn-ripple:nth-child(2) { animation-delay: .9s; }
+.world-finale.centered .sn-ripple:nth-child(3) { animation-delay: 1.8s; }
+.world-finale.centered .sn-ripple:nth-child(4) { animation-delay: 2.7s; }
+@keyframes sn-ripple {
+  0%   { opacity: 0; transform: scale(.1); stroke-width: 2.6; }
+  7%   { opacity: .9; }
+  100% { opacity: 0; transform: scale(9.5); stroke-width: .4; }
+}
+
+/* 최종 카피 */
+.world-copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8vh;
+  text-align: center;
+  opacity: 0;
+  translate: 0 26px;
+  transition:
+    opacity 1.2s var(--ease-out) .5s,
+    translate 1.2s var(--ease-out) .5s;
+}
+.world-finale.lit .world-copy { opacity: 1; translate: 0 0; }
+.world-copy h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(34px, 4.6vw, 84px);
+  letter-spacing: -.01em;
+  background: linear-gradient(120deg, #fff 30%, #bdeaff 60%, var(--cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 34px rgba(53, 210, 255, .35));
+}
+.world-copy p {
+  margin: 14px 0 0;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(13px, 1.1vw, 18px);
+  letter-spacing: .46em;
+  text-indent: .46em;
+  color: var(--ink-dim);
+}
+
+/* 월드 모드 — 무대(지도 씬) 요소 페이드아웃, 별 배경은 유지 */
+body.world-mode .city-logo-badge { z-index: 40; } /* 좌상단 시 로고는 세계지도 위에 */
+body.world-mode .map-wrap,
+body.world-mode .completion,
+body.world-mode .hud-meta,
+body.world-mode .test-run,
+body.world-mode .credit {
+  opacity: 0 !important;
+  visibility: hidden; /* 페이드 후 페인트 자체를 끊는다 — 월드 장면 성능 */
+  transition: opacity .9s var(--ease-soft), visibility 0s .95s;
+  pointer-events: none;
+}
+
+/* ============================================================
+   오퍼레이터 HUD (` 토글)
+   ============================================================ */
+.op-hud {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  translate: -50% 0;
+  z-index: 300;
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 560px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(4, 8, 14, .9);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.op-hud.open { display: flex; }
+.op-hud.rehearsal { border-color: rgba(245, 50, 75, .55); }
+.op-hud.rehearsal::after {
+  content: "REHEARSAL ×2";
+  position: absolute;
+  top: -9px;
+  right: 12px;
+  font-size: 10px;
+  letter-spacing: .18em;
+  color: var(--magenta);
+  background: rgba(4, 8, 14, .95);
+  padding: 0 8px;
+}
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+}
+.hud-now { color: var(--cyan); }
+.hud-next { color: var(--ink-faint); }
+.hud-jumps {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.hud-jumps button {
+  font: inherit;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink-dim);
+  border-radius: 6px;
+  padding: 4px 9px;
+  cursor: pointer;
+}
+.hud-jumps button:hover { border-color: rgba(150, 195, 255, .5); color: var(--ink); }
+.hud-jumps button.next { border-color: var(--cyan); color: var(--cyan); }
+.hud-jumps button.is-done { opacity: .38; }
+.hud-keys { color: var(--ink-faint); letter-spacing: .04em; }
